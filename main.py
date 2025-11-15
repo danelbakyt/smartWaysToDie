@@ -24,8 +24,8 @@ assetWidth = 70
 assetHeight = 120
 # Score system
 score = 0
-font = pygame.font.Font(None, 36)
-bigfont = pygame.font.Font(None, 72)
+font = pygame.font.Font("pixelfont.ttf", 24)
+bigfont = pygame.font.Font("pixelfont.ttf", 66)
 
 def reset_game():
     global player, score, running, startTime
@@ -233,7 +233,7 @@ def popup(message, option1="Yes", option2="No"):
         screen.blit(btn2_text, btn2_text.get_rect(center=btn2_rect.center))
 
         # Message text
-        msg_font = pygame.font.Font("pixelfont.ttf", 36)
+        msg_font = pygame.font.Font("pixelfont.ttf", 34)
         msg_text = msg_font.render(message, True, (0, 0, 0))
         screen.blit(msg_text, msg_text.get_rect(center=(popup_rect.centerx, popup_rect.y + 60)))
 
@@ -256,6 +256,8 @@ while running:
 
     keys = pygame.key.get_pressed()
 
+    old_x, old_y = player.x, player.y
+
     # Player movement
     if keys[pygame.K_LEFT]:
         if can_move(player, -player_speed, 0, collidables):
@@ -277,18 +279,13 @@ while running:
     if keys[pygame.K_r]:
         reset_game()
 
-
     for int_obj, msg in interactive_objects:
-        #second better option
-        #if not player.colliderect(int_obj):
-         #   x, y = player.x, player.y
         if player.colliderect(int_obj) and not popup_active:
             popup_active = True
             choice = popup(msg, "Yes", "No")
             if choice:
                 add_points(5)
-            while player.colliderect(int_obj):
-                player.y += 1
+            player.x, player.y = old_x, old_y
             popup_active = False
 
     # Draw floor
