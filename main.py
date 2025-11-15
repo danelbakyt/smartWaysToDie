@@ -234,16 +234,10 @@ while running:
     screen.blit(timerText, timerRect)
 
     if score >= 100:
-        break
+        gameOverScreen(elapsedTime)
 
     pygame.display.flip()
     clock.tick(60)   # limits to 60 FPS. This is to make sure it runs in same speed in all computers.
-
-for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-        pygame.quit(); sys.exit()
-
-gameOverScreen(elapsedTime)
 
 pygame.quit()
 sys.exit()
