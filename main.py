@@ -25,6 +25,49 @@ assetHeight = 120
 # Score system
 score = 0
 font = pygame.font.Font(None, 36)
+bigfont = pygame.font.Font(None, 72)
+
+
+#start screen
+def startScreen():
+    while True:
+        screen.fill((20, 20, 20))
+        title = bigfont.render("SMART WAYS TO DIE", True, (255, 255, 255))
+        d1 = font.render("Find the smartest and fastest way to die.", True, (200, 200, 200))
+        d2 = font.render("Your player dies at 100 points.", True, (200, 200, 200))
+        begin = font.render("Press SPACE to begin!", True, (255, 255, 255))
+
+        screen.blit(title, title.get_rect(center = (WINDOW_WIDTH // 2, 150)))
+        screen.blit(d1, d1.get_rect(center = (WINDOW_WIDTH // 2, 200)))
+        screen.blit(d2, d2.get_rect(center = (WINDOW_WIDTH // 2, 230)))
+        screen.blit(begin, begin.get_rect(center = (WINDOW_WIDTH // 2, 320)))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit(); sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                return
+
+        pygame.display.flip()
+        clock.tick(60)
+
+#game over screen; seconds is from timer
+def gameOverScreen(seconds):
+    while True:
+        screen.fill((20, 20, 20))
+
+        over = bigfont.render("YOU DIED! CONGRATS!", True, (255, 255, 255))
+        msg = font.render(f"You took {seconds} seconds to die!", True, (200, 200, 200))
+
+        screen.blit(over, over.get_rect(center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)))
+        screen.blit(msg, msg.get_rect(center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 50)))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit(); sys.exit()
+
+        pygame.display.flip()
+        clock.tick(60)
 
 def add_points(amount):
     """Increase the score."""
@@ -68,9 +111,9 @@ def setRoom():
         [WINDOW_WIDTH - wallWidth,0,wallWidth,WINDOW_HEIGHT+wallWidth],
 
         #bedroom walls
-        [roomWidth, 0, wallWidth, roomHeight - doorSize],   
-        [0, roomHeight, roomWidth//2, wallWidth],   
-        [roomWidth//2 + doorSize, roomHeight, 3*roomWidth//4, wallWidth],   
+        [roomWidth, 0, wallWidth, roomHeight - doorSize],
+        [0, roomHeight, roomWidth//2, wallWidth],
+        [roomWidth//2 + doorSize, roomHeight, 3*roomWidth//4, wallWidth],
         #garden
         [2*roomWidth,0,wallWidth,roomHeight],
         [5*roomWidth//4+2*doorSize, roomHeight, roomWidth//2, wallWidth],
@@ -122,8 +165,13 @@ collidables = walls + [coffee_table_rect, desk_rect, kitchen_rect, bonfire_rect]
 
 
 clock = pygame.time.Clock()
+
 # Main loop
 running = True
+
+#game loop
+startScreen()
+startTime = pygame.time.get_ticks() #to start timer after player presses space bar
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -133,6 +181,7 @@ while running:
             mouse_pos = event.pos  # (x, y) tuple
             if bonfire_rect.collidepoint(mouse_pos):
                 add_points(5)
+
 
     keys = pygame.key.get_pressed()
 
@@ -178,8 +227,23 @@ while running:
     score_rect = score_text.get_rect(topright=(WINDOW_WIDTH - 20, 20))
     screen.blit(score_text, score_rect)
 
+    # Draw timer under the score
+    elapsedTime = (pygame.time.get_ticks() - startTime) // 1000
+    timerText = font.render(f"Time: {elapsedTime}", True, (255, 255, 255))
+    timerRect = timerText.get_rect(topright = (WINDOW_WIDTH - 20, 40))
+    screen.blit(timerText, timerRect)
+
+    if score >= 100:
+        break
+
     pygame.display.flip()
-    clock.tick(60)   # limits to 60 FPS. This is to make sure it runs in same speed in all computers. 
+    clock.tick(60)   # limits to 60 FPS. This is to make sure it runs in same speed in all computers.
+
+for event in pygame.event.get():
+    if event.type == pygame.QUIT:
+        pygame.quit(); sys.exit()
+
+gameOverScreen(elapsedTime)
 
 pygame.quit()
 sys.exit()
